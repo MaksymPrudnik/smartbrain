@@ -51,6 +51,7 @@ class Signin extends React.Component {
                                     type="email" 
                                     name="email-address"  
                                     id="email-address" 
+                                    required
                                 />
                             </div>
                             <div className="mv3">
@@ -61,6 +62,7 @@ class Signin extends React.Component {
                                     type="password" 
                                     name="password"  
                                     id="password" 
+                                    required
                                 />
                             </div>
                         </fieldset>
