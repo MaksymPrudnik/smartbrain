@@ -6,7 +6,8 @@ class Register extends React.Component {
         this.state = {
             email: '',
             password: '',
-            name: ''
+            name: '',
+            submissionResult: ''
         }
     }
 
@@ -35,13 +36,17 @@ class Register extends React.Component {
             .then(response => response.json())
             .then(user => {
                 if (user.id) {
+                    this.setState({submissionResult: ''});
                     this.props.loadUser(user);
                     this.props.onRouteChange('home');
+                } else {
+                    this.setState({submissionResult: user});
                 }
             })
     }
 
     render() {
+        const { submissionResult } = this.state;
         return (
             <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
                 <main className="pa4 black-80">
@@ -68,7 +73,7 @@ class Register extends React.Component {
                                     id="email-address" 
                                 />
                             </div>
-                            <div class="mv3">
+                            <div className="mv3">
                                 <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
                                 <input 
                                     onChange={this.onPasswordChange}
@@ -86,6 +91,14 @@ class Register extends React.Component {
                                 type="submit" 
                                 value="Register" 
                             />
+                        </div>
+                        <div className='fail_message fw6' style={{
+                            backgroundColor: "#af111166",
+                            fontSize: '1.2rem',
+                            color: '#000',
+                            lineHeight: '40px'
+                            }}>
+                            <p>{submissionResult}</p>
                         </div>
                     </div>
                 </main>

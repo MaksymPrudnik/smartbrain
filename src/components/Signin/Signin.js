@@ -5,7 +5,8 @@ class Signin extends React.Component {
         super(props);
         this.state = {
             signInEmail: '',
-            signInPassword: ''
+            signInPassword: '',
+            submissionResult: ''
         }
     }
 
@@ -29,14 +30,18 @@ class Signin extends React.Component {
             .then(response => response.json())
             .then(user => {
                 if (user.id) {
+                    this.setState({submissionResult: ''});
                     this.props.loadUser(user);
                     this.props.onRouteChange('home');
+                } else {
+                    this.setState({submissionResult: user});
                 }
             })
     }
 
     render() {
         const { onRouteChange } = this.props;
+        const { submissionResult } = this.state;
         return (
             <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
                 <main className="pa4 black-80">
@@ -50,7 +55,8 @@ class Signin extends React.Component {
                                     className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" 
                                     type="email" 
                                     name="email-address"  
-                                    id="email-address" 
+                                    id="email-address"
+                                    required
                                 />
                             </div>
                             <div className="mv3">
@@ -60,7 +66,8 @@ class Signin extends React.Component {
                                     className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" 
                                     type="password" 
                                     name="password"  
-                                    id="password" 
+                                    id="password"
+                                    required
                                 />
                             </div>
                         </fieldset>
@@ -74,6 +81,14 @@ class Signin extends React.Component {
                         </div>
                         <div className="lh-copy mt3">
                             <p onClick={() => onRouteChange('register')} className="f6 link dim black db pointer">Register</p>
+                        </div>
+                        <div className='fail_message fw6' style={{
+                            backgroundColor: "#af111166",
+                            fontSize: '1.2rem',
+                            color: '#000',
+                            lineHeight: '40px'
+                            }}>
+                            <p>{submissionResult}</p>
                         </div>
                     </div>
                 </main>
