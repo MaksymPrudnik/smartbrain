@@ -7,6 +7,8 @@ import Rank from './components/Rank/Rank';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+import Modal from './components/Modal/Modal';
+import Profile from './components/Profile/Profile';
 import './App.css';
 
 
@@ -26,14 +28,16 @@ const initState = {
   input: '',
   imageUrl: '',
   boxes: [],
-  route: 'signin',
+  route: 'signin', // dont forget to change to signin
   isSignedIn: false,
+  isProfileOpen: false,
   user: {
     id: '',
     name: '',
     email: '',
     entries: 0,
-    joined: ''
+    joined: '',
+    avatar: ''
   }
 }
 
@@ -49,7 +53,8 @@ class App extends React.Component {
       name: data.name,
       email: data.email,
       entries: data.entries,
-      joined: data.joinded
+      joined: data.joined,
+      avatar: data.avatar
     }})
   }
 
@@ -108,19 +113,36 @@ class App extends React.Component {
 
   onRouteChange = (route) => {
     if(route === 'signout') {
-      this.setState(initState)
+      return this.setState(initState)
     } else if (route === 'home') {
       this.setState({isSignedIn: true})
     }
     this.setState({route: route});
   }
 
+  toggleModal = () => {
+    this.setState(prev => ({
+      ...prev,
+      isProfileOpen: !prev.isProfileOpen
+    }))
+  }
+
   render() {
-    const { isSignedIn, imageUrl, route, boxes, user } = this.state;
+    const { isSignedIn, imageUrl, route, boxes, user, isProfileOpen } = this.state;
     return (
       <div className="App">
         <Particles className='particles' params={particlesOptions} />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        <Navigation avatar={user.avatar} isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} toggleModal={this.toggleModal} />
+        {isProfileOpen ? 
+          <Modal>
+            <Profile 
+              loadUser={this.loadUser}
+              toggleModal={this.toggleModal}
+              user={user}
+            />
+          </Modal>
+          : null
+        }
         { route === 'home'
           ? <div>
               <Logo />

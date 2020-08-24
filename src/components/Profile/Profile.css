@@ -1,0 +1,38 @@
+.profile-modal {
+    background-color: #fffb;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-modal main {
+    padding: 2rem 0 2rem 2rem;
+}
+
+.profile_img {
+    height: 7rem;
+    width: 7rem;
+    object-fit: contain;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.profile_username {
+    text-align: center;
+}
+
+.modal-close {
+    font-size: 3rem;
+    font-style: bold;
+    cursor: pointer;
+}
+.modal-close:hover {
+    color: grey;
+    cursor: pointer;
+}
