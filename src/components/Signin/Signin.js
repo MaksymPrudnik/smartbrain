@@ -19,7 +19,7 @@ class Signin extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        fetch('https://smartreco-api.herokuapp.com/signin', {
+        fetch(`${this.props.host}/signin`, {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -28,13 +28,13 @@ class Signin extends React.Component {
             })
         })
             .then(response => response.json())
-            .then(user => {
-                if (user.id) {
+            .then(data => {
+                if (data.userId) {
                     this.setState({submissionResult: ''});
-                    this.props.loadUser(user);
+                    this.props.loadUser(data);
                     this.props.onRouteChange('home');
                 } else {
-                    this.setState({submissionResult: user});
+                    this.setState({submissionResult: data});
                 }
             })
     }

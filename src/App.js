@@ -28,7 +28,7 @@ const initState = {
   input: '',
   imageUrl: '',
   boxes: [],
-  route: 'signin', // dont forget to change to signin
+  route: 'signin',
   isSignedIn: false,
   isProfileOpen: false,
   user: {
@@ -40,6 +40,9 @@ const initState = {
     avatar: ''
   }
 }
+
+// in production environment has to have variable API_URL set to backendAPI URL
+const host =  process.env.API_URL || 'http://localhost:3000';
 
 class App extends React.Component {
   constructor() {
@@ -83,7 +86,7 @@ class App extends React.Component {
 
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});
-      fetch('https://smartreco-api.herokuapp.com/imageUrl', {
+      fetch(`${host}/imageUrl`, {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -93,7 +96,7 @@ class App extends React.Component {
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch('https://smartreco-api.herokuapp.com/image', {
+          fetch(`${host}/image`, {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -155,8 +158,8 @@ class App extends React.Component {
             </div>
            : (
              route === 'register' 
-             ? <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> 
-             : <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+             ? <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} host={host}/> 
+             : <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} host={host}/>
              ) 
         }
         </div>

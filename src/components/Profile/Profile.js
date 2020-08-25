@@ -37,7 +37,6 @@ class Profile extends React.Component {
     render() {
         const { toggleModal, user } = this.props;
         const { name, avatar } = this.state;
-        console.log(user);
         return (
             <div className='profile-modal'>
                 <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center bg-white">
