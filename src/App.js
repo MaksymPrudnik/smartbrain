@@ -50,8 +50,44 @@ class App extends React.Component {
     this.state = initState;
   }
 
+  componentDidMount() {
+    const token = window.localStorage.getItem('token');
+    if (token) {
+      fetch(`${host}/signin`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if(data && data.id) {
+            fetch(`${host}/profile/${data.id}`, {
+              method: 'get',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+              }
+            })
+              .then(response => response.json())
+              .then(user => {
+                if (user && user.email) {
+                  this.loadUser(user);
+                  this.onRouteChange('home');
+                }
+              })
+              .catch(console.log);
+          }
+        })
+        .catch(console.log)
+    }
+  }
+
   loadUser = (data) => {
-    this.setState({user: {
+    this.setState({
+      isSignedIn: true,
+      user: {
       id: data.id,
       name: data.name,
       email: data.email,
@@ -88,17 +124,29 @@ class App extends React.Component {
     this.setState({imageUrl: this.state.input});
       fetch(`${host}/imageUrl`, {
         method: 'post',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': window.localStorage.getItem('token')
+        },
         body: JSON.stringify({
           input: this.state.input
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        if (response.status === 401) {
+          this.onRouteChange('signout');
+          return Promise.reject('Unauthorized');
+        }
+        return response.json()
+      })
       .then(response => {
         if (response) {
           fetch(`${host}/image`, {
             method: 'put',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': window.localStorage.getItem('token')
+            },
             body: JSON.stringify({
               id: this.state.user.id
             })
@@ -111,12 +159,34 @@ class App extends React.Component {
         }
         this.displayFaceBoxes(this.calculateFaceLocations(response))
       })
-      .catch(err => console.log(err))
+      .catch(console.log)
   }
 
   onRouteChange = (route) => {
     if(route === 'signout') {
-      return this.setState(initState)
+      if (window.localStorage.getItem('token')) {
+        fetch(`${host}/signout`, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': window.localStorage.getItem('token')
+          }
+        })
+        .then(response => {
+          if (response.status === 400) {
+            return Promise.reject(response.json());
+          }
+          return response.json()
+        })
+        .then(response => {
+          if(response) {
+            return console.log(`Successfuly deleted token with id - ${response}`);
+          }
+        })
+        .catch(console.log)
+        window.localStorage.removeItem('token');  
+      }
+      return this.setState(initState);
     } else if (route === 'home') {
       this.setState({isSignedIn: true})
     }
@@ -142,6 +212,7 @@ class App extends React.Component {
               loadUser={this.loadUser}
               toggleModal={this.toggleModal}
               user={user}
+              host={host}
             />
           </Modal>
           : null

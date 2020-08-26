@@ -23,6 +23,10 @@ class Register extends React.Component {
         this.setState({ password: event.target.value})
     }
 
+    saveAuthToken = (token) => {
+        window.localStorage.setItem('token', token);
+    }
+
     onSubmitSignIn = () => {
         fetch(`${this.props.host}/register`, {
             method: 'post',
@@ -33,16 +37,30 @@ class Register extends React.Component {
                 name: this.state.name
             })
         })
-            .then(response => response.json())
-            .then(user => {
-                if (user.id) {
-                    this.setState({submissionResult: ''});
-                    this.props.loadUser(user);
-                    this.props.onRouteChange('home');
-                } else {
-                    this.setState({submissionResult: user});
-                }
-            })
+        .then(response => response.json())
+        .then(data => {
+            if (data.userId && data.success) {
+                this.saveAuthToken(data.token);
+                this.setState({submissionResult: ''});
+                fetch(`${this.props.host}/profile/${data.userId}`, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': data.token
+                    }
+                  })
+                    .then(response => response.json())
+                    .then(user => {
+                      if (user && user.email) {
+                        this.props.loadUser(user);
+                        this.props.onRouteChange('home');
+                      }
+                    })
+                    .catch(console.log);
+            } else {
+                this.setState({submissionResult: data});
+            }
+        })
     }
 
     render() {

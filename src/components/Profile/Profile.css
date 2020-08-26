@@ -36,3 +36,10 @@
     color: grey;
     cursor: pointer;
 }
+
+.fail_message {
+    background-color: #af111166;
+    font-size: 1.2rem;
+    color: #000;
+    line-height: 40px;
+}

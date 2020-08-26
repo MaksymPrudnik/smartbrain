@@ -6,17 +6,24 @@ class Profile extends React.Component {
         super(props);
         this.state = {
             name: this.props.user.name,
-            avatar: this.props.user.avatar
+            avatar: this.props.user.avatar,
+            updated: false
         }
     }
 
     onFormChange = event => {
         switch(event.target.name) {
             case 'user-name':
-                this.setState({name: event.target.value});
+                this.setState({
+                    name: event.target.value,
+                    updated: true
+                });
                 break;
             case 'avatar':
-                this.setState({avatar: event.target.value});
+                this.setState({
+                    avatar: event.target.value,
+                    updated: true
+                });
                 break;
             default:
                 return;
@@ -24,14 +31,23 @@ class Profile extends React.Component {
     }
 
     onProfileUpdate = (data) => {
-        fetch(`https://smartreco-api.herokuapp.com/profile/${this.props.user.id}`, {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ formInput: data })
-        }).then(resp => {
+        if((data.name || data.avatar) && this.state.updated) {
+            fetch(`${this.props.host}/profile/${this.props.user.id}`, {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': window.localStorage.getItem('token')
+                },
+                body: JSON.stringify({ formInput: data })
+            }).then(resp => {
+                this.props.toggleModal();
+                this.props.loadUser({ ...this.props.user, ...data});
+                this.setState({updated: false});
+            }).catch(console.log)
+        } else {
+            this.setState({ updated: false});
             this.props.toggleModal();
-            this.props.loadUser({ ...this.props.user, ...data});
-        }).catch(console.log)
+        }
     }
 
     render() {
@@ -81,14 +97,6 @@ class Profile extends React.Component {
                                 Cancel
                             </button>    
                         </div>
-                        {/* <div className='fail_message fw6' style={{
-                            backgroundColor: "#af111166",
-                            fontSize: '1.2rem',
-                            color: '#000',
-                            lineHeight: '40px'
-                            }}>
-                            <p>{submissionResult}</p>
-                        </div> */}
                     </main>
                     <div className='modal-close' onClick={toggleModal}>&times;</div>
                 </article>
